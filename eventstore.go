@@ -12,9 +12,6 @@ type Eventstore interface {
 
 	// Get loads all events for an instance of an aggregate.
 	Get(aggregateType string, aggregateID string) ([]Event, error)
-
-	// DeleteAllData deletes all your data.
-	DeleteAllData() error
 }
 
 // Event is returned by fileEventstore.Get().

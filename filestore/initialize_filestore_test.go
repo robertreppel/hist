@@ -1,22 +1,16 @@
 package filestore
 
 import (
+	"os"
 	"testing"
 
-	"github.com/robertreppel/hist"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestCreateMissingDataDirectory(t *testing.T) {
 	dataStoreDirectory := "/tmp/hist-test-create-missing-directory"
 	Convey("Given that no data directory exists", t, func() {
-		var eventStore hist.Eventstore
-		var err error
-		eventStore, err = FileStore(dataStoreDirectory)
-		if err != nil {
-			panic(err)
-		}
-		eventStore.DeleteAllData()
+		deleteAllData(dataStoreDirectory)
 		Convey("when the FileStore is initialized", func() {
 			_, err := FileStore(dataStoreDirectory)
 			if err != nil {
@@ -37,22 +31,12 @@ func TestCreateMissingDataDirectory(t *testing.T) {
 	})
 }
 
-var eventStore fileEventstore
-
-func TestDeleteAllData(t *testing.T) {
-	dataStoreDirectory := "/tmp/hist-test-delete-all-data-directory"
-	Convey("Given that a data directory exists", t, func() {
-		eventStore, err := FileStore(dataStoreDirectory)
-		if err != nil {
-			panic(err)
-		}
-		Convey("when DeleteAllData is called", func() {
-			err := eventStore.DeleteAllData()
-			So(err, ShouldBeNil)
-			Convey("then the data directory should not exist.", func() {
-				dbDirectoryExists, _ := exists(dataStoreDirectory)
-				So(dbDirectoryExists, ShouldBeFalse)
-			})
-		})
-	})
+func deleteAllData(dataDirectory string) error {
+	mutex.Lock()
+	err := os.RemoveAll(dataDirectory)
+	mutex.Unlock()
+	if err != nil {
+		return err
+	}
+	return nil
 }
