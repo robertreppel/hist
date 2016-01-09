@@ -8,7 +8,7 @@ import (
 	"github.com/robertreppel/hist/filestore"
 )
 
-const eventDataDirectory = "/tmp/hist-hello-world-data"
+const eventDataDirectory = "data"
 
 func main() {
 	planet, result := createWorld("Earth")
