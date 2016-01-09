@@ -23,4 +23,4 @@ _testmain.go
 *.test
 *.prof
 tmp
-example/planets/planets
+examples/planets/planets
