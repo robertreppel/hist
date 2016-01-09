@@ -1,5 +1,7 @@
 # Hist: A Simple Eventstore in Go.
 
+A data store for event sourced applications.
+
 ## Usage
 
 ```golang
@@ -38,7 +40,7 @@ func failIf(err error) {
 }
 ```
 
-For a more comprehensive example:
+Full (minimalist) event sourcing example:
 
 ```
 cd examples/planets
