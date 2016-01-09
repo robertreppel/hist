@@ -7,8 +7,18 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func TestMandatoryFilestoreDataDirectory(t *testing.T) {
+	Convey("When creating a FileStore with a blank dataStoreDirectory", t, func() {
+		_, err := FileStore("")
+		Convey("an error should occur.", func() {
+			So(err.Error(), ShouldEqual, "dataDirectory cannot be blank")
+
+		})
+	})
+}
+
 func TestCreateMissingDataDirectory(t *testing.T) {
-	dataStoreDirectory := "/tmp/hist-test-create-missing-directory"
+	dataStoreDirectory := "/tmp/hist-test-filestore-create-missing-directory"
 	Convey("Given that no data directory exists", t, func() {
 		deleteAllData(dataStoreDirectory)
 		Convey("when the FileStore is initialized", func() {
@@ -17,14 +27,11 @@ func TestCreateMissingDataDirectory(t *testing.T) {
 				panic(err)
 			}
 			Convey("then the data directory exists.", func() {
-				dbDirectoryExists, _ := exists(dataStoreDirectory)
+				dbDirectoryExists := exists(dataStoreDirectory)
 				So(dbDirectoryExists, ShouldBeTrue)
 			})
 			Convey("and the events directory exists.", func() {
-				dbDirectoryExists, err := exists(dataStoreDirectory + "/events")
-				if err != nil {
-					panic(err)
-				}
+				dbDirectoryExists := exists(dataStoreDirectory + "/events")
 				So(dbDirectoryExists, ShouldBeTrue)
 			})
 		})

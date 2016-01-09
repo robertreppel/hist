@@ -16,8 +16,8 @@ var mutex = &sync.Mutex{}
 
 //Save persists an event for an aggregate.
 func (store fileEventstore) Save(aggregateType string, aggregateID string, eventType string, eventData []byte) error {
-	if store.dataDirectory == "" {
-		return errors.New("No data directory.")
+	if !exists(store.dataDirectory) {
+		return errors.New("No data directory")
 	}
 	err := checkMandatoryParameters(aggregateType, aggregateID, eventType, eventData)
 	if err != nil {
@@ -27,11 +27,7 @@ func (store fileEventstore) Save(aggregateType string, aggregateID string, event
 	//If no directory exists for storing instances of the aggregate type, create one:
 	aggregatePath := store.eventsDirectory + "/" + aggregateType
 	mutex.Lock()
-	aggregateExists, err := exists(aggregatePath)
-	if err != nil {
-		mutex.Unlock()
-		return err
-	}
+	aggregateExists := exists(aggregatePath)
 	if !aggregateExists {
 		err = createDirectory(aggregatePath)
 		if err != nil {
@@ -40,11 +36,11 @@ func (store fileEventstore) Save(aggregateType string, aggregateID string, event
 		}
 	}
 
+	var file *os.File
+
 	// If no file exists for this aggregate instance, create one:
 	aggregateInstanceFile := aggregatePath + "/" + aggregateID + ".events"
-	aggregateInstanceFileExists, err := exists(aggregateInstanceFile)
-	var file *os.File
-	if !aggregateInstanceFileExists {
+	if !exists(aggregateInstanceFile) {
 		file, err = store.createAggregate(aggregatePath, aggregateID)
 		if err != nil {
 			mutex.Unlock()
@@ -64,14 +60,11 @@ func (store fileEventstore) Save(aggregateType string, aggregateID string, event
 	}
 	now := time.Now()
 	eventRecord := hist.Event{Timestamp: now, Type: eventType, Data: eventData}
-	// log.Printf("DEBUG hist.Save() eventRecord: '%v'\n", eventRecord)
-
 	eventRecordJSON, err := json.Marshal(eventRecord)
 	if err != nil {
 		mutex.Unlock()
 		return err
 	}
-	// log.Printf("DEBUG hist.Save() evenRecordJSON: '%v'\n", string(eventRecordJSON))
 	encodedEventRecord := b64.StdEncoding.EncodeToString(eventRecordJSON)
 	if _, err = file.WriteString(encodedEventRecord + "\n"); err != nil {
 		mutex.Unlock()
