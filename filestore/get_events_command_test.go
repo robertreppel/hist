@@ -11,7 +11,7 @@ import (
 
 func TestGettingAggregateWhichDoesntExist(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-test-data"
+		dataStoreDirectory := "/tmp/hist-filestore-test-data"
 		var store hist.Eventstore
 		var err error
 		store, err = FileStore(dataStoreDirectory)
@@ -30,9 +30,28 @@ func TestGettingAggregateWhichDoesntExist(t *testing.T) {
 	})
 }
 
+func TestMissingDataDirectory(t *testing.T) {
+	Convey("Given an event store", t, func() {
+		dataStoreDirectory := "/tmp/hist-filestore-test-missing-datadirectory"
+		var store hist.Eventstore
+		var err error
+		store, err = FileStore(dataStoreDirectory)
+		if err != nil {
+			panic(err)
+		}
+		deleteAllData(dataStoreDirectory)
+		Convey("when I get an aggregate which doesn't exist", func() {
+			_, err := store.Get("UnknownAggregate", "12345")
+			Convey("an error should occur.", func() {
+				So(err.Error(), ShouldEqual, "Missing data directory")
+			})
+		})
+	})
+}
+
 func TestGettingOneEvent(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-test-data"
+		dataStoreDirectory := "/tmp/hist-test-filestore-data"
 		var eventStore hist.Eventstore
 		var err error
 		eventStore, err = FileStore(dataStoreDirectory)
@@ -69,7 +88,7 @@ func TestGettingOneEvent(t *testing.T) {
 
 func TestGettingMoreThanOneEvent(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-test-data"
+		dataStoreDirectory := "/tmp/hist-filestore-test-data"
 		var eventStore hist.Eventstore
 		var err error
 		eventStore, err = FileStore(dataStoreDirectory)

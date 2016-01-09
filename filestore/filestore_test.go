@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-const eventDataDirectory = "data"
+const eventDataDirectory = "/tmp/hist-filestore-test"
 
 func Example() {
 	eventStore, err := FileStore(eventDataDirectory)

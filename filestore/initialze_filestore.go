@@ -1,7 +1,9 @@
 package filestore
 
 import (
+	"errors"
 	"os"
+	"strings"
 
 	"github.com/robertreppel/hist"
 )
@@ -12,31 +14,24 @@ type fileEventstore struct {
 }
 
 //FileStore stores events in the local file system.
-func FileStore(path string) (hist.Eventstore, error) {
+func FileStore(dataDirectory string) (hist.Eventstore, error) {
+	if len(strings.TrimSpace(dataDirectory)) == 0 {
+		return nil, errors.New("dataDirectory cannot be blank")
+	}
 	var store fileEventstore
 	mutex.Lock()
-	dataDirectoryExists, err := exists(path)
-	if err != nil {
-		mutex.Unlock()
-		return nil, err
-	}
-	store.dataDirectory = path
+	store.dataDirectory = dataDirectory
 	store.eventsDirectory = store.dataDirectory + "/events"
-	if !dataDirectoryExists {
-		err = createDirectory(store.dataDirectory)
+	if !exists(dataDirectory) {
+		err := createDirectory(store.dataDirectory)
 		if err != nil {
 			mutex.Unlock()
 			return nil, err
 		}
 	}
 
-	eventDirectoryExists, err := exists(store.eventsDirectory)
-	if err != nil {
-		mutex.Unlock()
-		return nil, err
-	}
-	if !eventDirectoryExists {
-		err = createDirectory(store.eventsDirectory)
+	if !exists(store.eventsDirectory) {
+		err := createDirectory(store.eventsDirectory)
 		if err != nil {
 			mutex.Unlock()
 			return nil, err
@@ -47,15 +42,15 @@ func FileStore(path string) (hist.Eventstore, error) {
 }
 
 // exists returns whether the given file or directory exists or not
-func exists(path string) (bool, error) {
+func exists(path string) bool {
 	_, err := os.Stat(path)
 	if err == nil {
-		return true, nil
+		return true
 	}
 	if os.IsNotExist(err) {
-		return false, nil
+		return false
 	}
-	return true, err
+	return true
 }
 
 func createDirectory(path string) error {

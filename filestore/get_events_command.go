@@ -5,21 +5,19 @@ import (
 	b64 "encoding/base64"
 	"encoding/json"
 	"errors"
+	"os"
 
 	"github.com/robertreppel/hist"
-	// "log"
-	"os"
 )
 
 //Get events gets the events for an aggregate
 func (store fileEventstore) Get(aggregateType string, aggregateID string) ([]hist.Event, error) {
+	if exists(store.eventsDirectory) == false {
+		return nil, errors.New("Missing data directory")
+	}
 	path := store.eventsDirectory + "/" + aggregateType + "/" + aggregateID + ".events"
 	mutex.Lock()
-	aggregateExists, err := exists(path)
-	if err != nil {
-		mutex.Unlock()
-		return nil, err
-	}
+	aggregateExists := exists(path)
 	if !aggregateExists {
 		var emptyResult []hist.Event
 		mutex.Unlock()
@@ -37,14 +35,11 @@ func (store fileEventstore) Get(aggregateType string, aggregateID string) ([]his
 	var events []hist.Event
 	encodedMessage, isPrefix, err := r.ReadLine()
 	for err == nil && !isPrefix {
-		// log.Printf("DEBUG hist.Get - line: '%v'\n", string(encodedMessage))
-		// log.Printf("DEBUG hist.Get - encodedMessage: '%v'\n", string(encodedMessage))
 		messageBytes, err := b64.StdEncoding.DecodeString(string(encodedMessage))
 		if err != nil {
 			mutex.Unlock()
 			panic(err)
 		}
-		// log.Printf("DEBUG hist.Get - messageBytes: '%v'\n", string(messageBytes))
 		var event hist.Event
 		if len(messageBytes) == 0 {
 			mutex.Unlock()

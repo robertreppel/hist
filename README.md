@@ -13,7 +13,7 @@ import (
 	"github.com/robertreppel/hist/filestore"
 )
 
-const eventDataDirectory = "data"
+const eventDataDirectory = "/tmp/hist-examples-helloworld"
 
 func main() {
 	eventStore, err := filestore.FileStore(eventDataDirectory)

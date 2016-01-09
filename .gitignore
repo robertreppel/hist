@@ -24,4 +24,3 @@ _testmain.go
 *.prof
 tmp
 example/planets/planets
-data

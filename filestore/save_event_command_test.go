@@ -8,33 +8,65 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestStoringEventWithoutData(t *testing.T) {
-	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-test-data"
+func TestMandatoryParameters(t *testing.T) {
+	dataStoreDirectory := "/tmp/hist-test-filestore-data"
+	var eventStore hist.Eventstore
+	var err error
+	eventStore, err = FileStore(dataStoreDirectory)
+	if err != nil {
+		panic(err)
+	}
+	Convey("When saving an event without an aggregate type", t, func() {
+		err = eventStore.Save("", "id", "EventType", []byte("Event data."))
+		Convey("then an error occurs.", func() {
+			So(err.Error(), ShouldEqual, "aggregateType cannot be blank")
+		})
+	})
+	Convey("When saving an event without an aggregate id", t, func() {
+		err = eventStore.Save("AggregateType", "", "EventType", []byte("Event data."))
+		Convey("then an error occurs.", func() {
+			So(err.Error(), ShouldEqual, "aggregateID cannot be blank")
+		})
+	})
+	Convey("When saving an event without an event type", t, func() {
+		err = eventStore.Save("AggregateType", "1234", "", []byte("Event data."))
+		Convey("then an error occurs.", func() {
+			So(err.Error(), ShouldEqual, "eventType cannot be blank")
+		})
+	})
+	Convey("When saving an event without any data", t, func() {
+		aggregateType := "GravelAggregate"
+		id, _ := uuid.NewV4()
+		aggregateID := id.String()
+		var data []byte
+		err = eventStore.Save(aggregateType, aggregateID, "EventType", data)
+		Convey("then an error occurs.", func() {
+			So(err, ShouldNotBeNil)
+		})
+	})
+}
+
+func TestSavingToMissingDataDirectory(t *testing.T) {
+	Convey("Given an event store with a data directory that doesn't exist", t, func() {
+		dataStoreDirectory := "/tmp/hist-filestore-test-saving-missing-directory"
 		var eventStore hist.Eventstore
 		var err error
 		eventStore, err = FileStore(dataStoreDirectory)
 		if err != nil {
 			panic(err)
 		}
-		Convey("and an event without any data", func() {
-			aggregateType := "GravelAggregate"
-			id, _ := uuid.NewV4()
-			aggregateID := id.String()
-			var data []byte
-			Convey("when save event is called", func() {
-				err = eventStore.Save(aggregateType, aggregateID, "EventType", data)
-				Convey("then an error occurs.", func() {
-					So(err, ShouldNotBeNil)
-				})
-			})
+		deleteAllData(dataStoreDirectory)
+		Convey("saving an event should not succeed", func() {
+			err = eventStore.Save("SomeAggregate", "12356", "EventType", []byte("event data."))
+			So(err, ShouldNotBeNil)
+			So(err.Error(), ShouldEqual, "No data directory")
 		})
 	})
 }
 
 func TestStoringNewEvent(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-test-data"
+		dataStoreDirectory := "/tmp/hist-test-filestore-data"
 		var eventStore hist.Eventstore
 		var err error
 		eventStore, err = FileStore(dataStoreDirectory)
