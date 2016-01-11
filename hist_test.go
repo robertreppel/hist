@@ -1,13 +1,16 @@
-package filestore
+package hist_test
 
 import (
 	"fmt"
+
+	"github.com/robertreppel/hist/filestore"
 )
 
 const eventDataDirectory = "/tmp/hist-filestore-test"
 
+// Storing and retrieving events for an aggregate:
 func Example() {
-	eventStore, err := FileStore(eventDataDirectory)
+	eventStore, err := filestore.FileStore(eventDataDirectory)
 	failIf(err)
 
 	aggregateType := "Customer"

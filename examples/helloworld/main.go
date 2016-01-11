@@ -1,3 +1,4 @@
+//An example for saving and retrieving events for an aggregate.
 package main
 
 import (
