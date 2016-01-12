@@ -1,4 +1,4 @@
-//A minimalist example for doing event sourcing with hist.
+//Event sourcing with hist, minimalist.
 package main
 
 import (
