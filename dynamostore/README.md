@@ -2,8 +2,8 @@
 
 ## Running the tests:
 
-Install local DynamoDB: 
+Install local DynamoDB:
 
 * ```docker pull kcyeu/dynamodb-local```
 
-* ```docker run -d --name dynamodb kcyeu/dynamodb-local```
+* ```docker run -d -p 8000:8000 --name dynamodb kcyeu/dynamodb-local```
