@@ -1,8 +1,9 @@
 package dynamostore
 
 import (
-	"errors"
-	"log"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -24,7 +25,24 @@ func (store dynamoEventstore) Get(aggregateType string, aggregateID string) ([]h
 	if err != nil {
 		return nil, err
 	}
-	log.Println(resp)
-
-	return nil, errors.New("Not implemented.")
+	events := []hist.Event{}
+	cnt := int64(0)
+	for cnt < *resp.Count {
+		event := resp.Items[cnt]
+		timeNano, err := strconv.Atoi(*event["Timestamp"].N)
+		if err != nil {
+			return nil, err
+		}
+		aggregateType := strings.Split(*event["AggregateTypeAndId"].S, ":")[0]
+		timestamp := time.Unix(0, int64(timeNano))
+		data := event["Data"].B
+		newEvent := hist.Event{
+			Type:      aggregateType,
+			Timestamp: timestamp,
+			Data:      data,
+		}
+		events = append(events, newEvent)
+		cnt++
+	}
+	return events, nil
 }
