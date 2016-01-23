@@ -8,12 +8,7 @@ import (
 
 // Create a DynameDB event store.
 func Create(tableName string, region string, endpoint string) error {
-	config := aws.NewConfig().WithRegion(region)
-	sess := session.New(config)
-	db := dynamodb.New(sess)
-	if endpoint != "" {
-		db.Endpoint = endpoint
-	}
+	db := getDb(region, endpoint)
 
 	params := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
@@ -47,4 +42,14 @@ func Create(tableName string, region string, endpoint string) error {
 		return err
 	}
 	return nil
+}
+
+func getDb(region string, endpoint string) *dynamodb.DynamoDB {
+	config := aws.NewConfig().WithRegion(region)
+	sess := session.New(config)
+	db := dynamodb.New(sess)
+	if endpoint != "" {
+		db.Endpoint = endpoint
+	}
+	return db
 }

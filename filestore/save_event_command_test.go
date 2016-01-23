@@ -23,13 +23,13 @@ func TestMandatoryParameters(t *testing.T) {
 		})
 	})
 	Convey("When saving an event without an aggregate id", t, func() {
-		err = eventStore.Save("AggregateType", "", "EventType", []byte("Event data."))
+		err = eventStore.Save("SomeAggregate", "", "EventType", []byte("Event data."))
 		Convey("then an error occurs.", func() {
 			So(err.Error(), ShouldEqual, "aggregateID cannot be blank")
 		})
 	})
 	Convey("When saving an event without an event type", t, func() {
-		err = eventStore.Save("AggregateType", "1234", "", []byte("Event data."))
+		err = eventStore.Save("SomeAggregate", "1234", "", []byte("Event data."))
 		Convey("then an error occurs.", func() {
 			So(err.Error(), ShouldEqual, "eventType cannot be blank")
 		})
