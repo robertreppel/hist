@@ -26,6 +26,9 @@ func (store dynamoEventstore) Save(aggregateType string, aggregateID string, eve
 			"Timestamp": {
 				N: aws.String(strconv.FormatInt(time.Now().UnixNano(), 10)),
 			},
+			"Type": {
+				S: aws.String(eventType),
+			},
 			"Data": {
 				B: eventData,
 			},

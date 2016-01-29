@@ -7,15 +7,13 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/robertreppel/hist"
+	"github.com/robertreppel/hist/dynamostore"
 	"github.com/robertreppel/hist/examples/trackmyships/ship"
 	"github.com/robertreppel/hist/filestore"
 )
 
-const dataStoreDirectory string = "/tmp/hist-example-ship"
-
-func init() {
-	deleteAllDataFrom(dataStoreDirectory)
-}
+const useDynamo = true // false = use local file storage. true = Use DynamoDB local.
 
 func main() {
 	fmt.Println("\nSHIP LOCATION TRACKER")
@@ -88,9 +86,36 @@ func depart(shipName string) string {
 	return result
 }
 
+const dataStoreDirectory = "/tmp/hist-example-ship"
+const eventstoreTable = "ShipTracker"
+const region = "us-west-2"
+
+// If no endpoint is configured, cloud AWS DynamoDB will be used.
+// const endpoint = ""
+
+// Local DynamoDB; see https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/
+const endpoint = "http://localhost:8000"
+
+func init() {
+	if useDynamo {
+		fmt.Println("Using Dynamodb.")
+		dynamostore.Create(eventstoreTable, region, endpoint)
+	} else {
+		fmt.Println("Using Filestore.")
+		deleteAllDataFrom(dataStoreDirectory)
+	}
+}
+
 func getPortsOfCallHistory(shipName string) []interface{} {
-	store, err := filestore.FileStore(dataStoreDirectory)
-	failIf(err)
+	var store hist.Eventstore
+	var err error
+	if useDynamo {
+		store, err = dynamostore.DynamoStore(eventstoreTable, region, endpoint)
+		failIf(err)
+	} else {
+		store, err = filestore.FileStore(dataStoreDirectory)
+		failIf(err)
+	}
 
 	eventHistory, err := store.Get(shipAggregateType, shipName)
 	failIf(err)
@@ -120,8 +145,15 @@ func getPortsOfCallHistory(shipName string) []interface{} {
 }
 
 func updatePortsOfCallHistory(shipName string, changes []interface{}) {
-	store, err := filestore.FileStore(dataStoreDirectory)
-	failIf(err)
+	var store hist.Eventstore
+	var err error
+	if useDynamo {
+		store, err = dynamostore.DynamoStore(eventstoreTable, region, endpoint)
+		failIf(err)
+	} else {
+		store, err = filestore.FileStore(dataStoreDirectory)
+		failIf(err)
+	}
 	for _, event := range changes {
 		jsonEvent, err := json.Marshal(event)
 		failIf(err)

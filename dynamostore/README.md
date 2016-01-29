@@ -2,8 +2,5 @@
 
 ## Running the tests:
 
-Install local DynamoDB:
-
-* ```docker pull kcyeu/dynamodb-local```
-
-* ```docker run -d -p 8000:8000 --name dynamodb kcyeu/dynamodb-local```
+Requires local DynamoDB.
+See https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/

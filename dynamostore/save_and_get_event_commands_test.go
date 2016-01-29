@@ -31,8 +31,8 @@ func TestSaveEvent(t *testing.T) {
 					events, err := store.Get("SomeAggregate", "123456")
 					So(err, ShouldBeNil)
 					So(len(events), ShouldEqual, 1)
-					Convey("and has an aggregate type", func() {
-						So(events[0].Type, ShouldEqual, "SomeAggregate")
+					Convey("and has the right event type", func() {
+						So(events[0].Type, ShouldEqual, "EventType")
 					})
 					Convey("and event data are correct", func() {
 						So(string(events[0].Data), ShouldEqual, "Event data.")
@@ -40,9 +40,6 @@ func TestSaveEvent(t *testing.T) {
 					Convey("and there is a timestamp", func() {
 						So(events[0].Timestamp.UnixNano(), ShouldBeGreaterThan, now)
 					})
-					// Convey("and there is an event type", func() {
-					// 	So(events[0].EventType, ShouldEqual, "SomeAggregate")
-					// })
 				})
 			})
 		})

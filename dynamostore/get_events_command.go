@@ -2,7 +2,6 @@ package dynamostore
 
 import (
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -33,11 +32,11 @@ func (store dynamoEventstore) Get(aggregateType string, aggregateID string) ([]h
 		if err != nil {
 			return nil, err
 		}
-		aggregateType := strings.Split(*event["AggregateTypeAndId"].S, ":")[0]
 		timestamp := time.Unix(0, int64(timeNano))
 		data := event["Data"].B
+		eventType := event["Type"].S
 		newEvent := hist.Event{
-			Type:      aggregateType,
+			Type:      *eventType,
 			Timestamp: timestamp,
 			Data:      data,
 		}
