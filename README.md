@@ -51,13 +51,19 @@ go build
 
 ## Design
 
+### File Storage
+
 Events are stored in files. Each aggregate type is a directory. Each aggregate instance is a file, with events appended
 when they are saved. For example, given a data directory _"/data"_, a _"User"_ aggregate and a user with id _"12345"_, when an
 "EmailChanged" event is saved it is appended to _"/data/events/User/12345.events"_
 
+### AWS DynamoDB Storage
+
+Events are stored in a DynamoDB table. See ```examples/trackmyships```.
+
 ## Tests
 
-Uses http://goconvey.co/. Run it to see BDD-style details about hist's business rules and behaviour.
+Uses http://goconvey.co/. Run it to see BDD-style details about hist's business rules and behaviour. Note that to get all of them to pass a local DynamoDB instance must be running. (https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/)
 
 ## Production Use
 
