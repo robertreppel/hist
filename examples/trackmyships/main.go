@@ -13,7 +13,7 @@ import (
 	"github.com/robertreppel/hist/filestore"
 )
 
-const useDynamo = true // false = use local file storage. true = Use DynamoDB local.
+const useDynamo = true // false = use local file storage.
 
 func main() {
 	fmt.Println("\nSHIP LOCATION TRACKER")

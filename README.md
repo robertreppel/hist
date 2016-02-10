@@ -63,7 +63,7 @@ Events are stored in a DynamoDB table. See ```examples/trackmyships```.
 
 ## Tests
 
-Uses http://goconvey.co/. Run it to see BDD-style details about hist's business rules and behaviour. Note that to get all of them to pass a local DynamoDB instance must be running. (https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/)
+Uses http://goconvey.co/. Run it to see BDD-style details about hist's business rules and behaviour. For the integration tests to pass, a local DynamoDB instance must be running. ( https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/ )
 
 ## Production Use
 
