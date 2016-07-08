@@ -1,5 +1,6 @@
 package ship
 
+// Register a ship so it can be tracked.
 func Register(name string, location string) (*Ship, string, error) {
 	if len(name) == 0 {
 		return nil, "Ship name cannot be blank.", nil
