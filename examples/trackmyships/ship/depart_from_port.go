@@ -1,5 +1,6 @@
 package ship
 
+// Depart from a port.
 func (ship *Ship) Depart() (string, error) {
 	if ship.location == AtSea {
 		return "Cannot depart from port: Ship is at sea.", nil

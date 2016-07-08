@@ -24,4 +24,7 @@ _testmain.go
 *.prof
 tmp
 examples/planets/planets
+examples/planets/planets.exe
 examples/trackmyships/trackmyships
+examples/trackmyships/trackmyships.exe
+

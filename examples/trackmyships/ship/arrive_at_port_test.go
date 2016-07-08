@@ -61,9 +61,35 @@ func TestArrivingAtAPort(t *testing.T) {
 			Convey("then a 'Arrived' event occurs", func() {
 				arrived := ship.Changes[1].(Arrived)
 				So(arrived, ShouldNotBeNil)
+				So(arrived.Port, ShouldEqual, "Hull")
+				So(arrived.ShipID, ShouldEqual, "FlyingDutchman")
 				Convey("and 'Success' is returned.", func() {
 					So(result, ShouldEqual, "Success")
 				})
+			})
+		})
+	})
+}
+
+func TestLoadingShipFromEventHistory(t *testing.T) {
+	Convey("Given a ship", t, func() {
+		ship := Ship{}
+		ship.transition(Registered{"FlyingDutchman", "At Sea"})
+		Convey("when it's registered", func() {
+			Convey("then it should be at sea.", func() {
+				So(ship.location, ShouldEqual, "At Sea")
+			})
+		})
+		Convey("when it arrives", func() {
+			ship.transition(Arrived{Port: "Beaulieu", ShipID: "FlyingDutchman"})
+			Convey("then it should be in port.", func() {
+				So(ship.location, ShouldEqual, "Beaulieu")
+			})
+		})
+		Convey("when it departs", func() {
+			ship.transition(Departed{Port: "Beaulieu", ShipID: "FlyingDutchman"})
+			Convey("then it should be at sea.", func() {
+				So(ship.location, ShouldEqual, "At Sea")
 			})
 		})
 	})
