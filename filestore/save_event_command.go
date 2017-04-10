@@ -6,60 +6,38 @@ import (
 	"errors"
 	"os"
 	"strings"
-	"sync"
 	"time"
+
+	"path/filepath"
 
 	"github.com/robertreppel/hist"
 )
 
-var mutex = &sync.Mutex{}
-
 //Save persists an event for an aggregate.
-func (store fileEventstore) Save(aggregateType string, aggregateID string, eventType string, eventData []byte) error {
-	if !exists(store.dataDirectory) {
-		return errors.New("No data directory")
-	}
-	err := checkMandatoryParameters(aggregateType, aggregateID, eventType, eventData)
+func (store fileEventstore) Save(streamID string, eventType string, eventData []byte) error {
+	err := checkMandatoryParameters(streamID, eventType, eventData)
 	if err != nil {
 		return err
 	}
 
-	//If no directory exists for storing instances of the aggregate type, create one:
-	aggregatePath := store.eventsDirectory + "/" + aggregateType
-	mutex.Lock()
-	aggregateExists := exists(aggregatePath)
-	if !aggregateExists {
-		err = createDirectory(aggregatePath)
-		if err != nil {
-			mutex.Unlock()
-			return err
-		}
-	}
-
 	var file *os.File
 
-	// If no file exists for this aggregate instance, create one:
-	aggregateInstanceFile := aggregatePath + "/" + aggregateID + ".events"
-	if !exists(aggregateInstanceFile) {
-		file, err = store.createAggregate(aggregatePath, aggregateID)
-		if err != nil {
-			mutex.Unlock()
-			return err
-		}
-		defer file.Close()
+	// Append the new event to the aggregate instance file:
+	mutex.Lock()
+
+	if exists(filepath.Join(store.dataDirectory, "eventlog.dat")) {
+		file, err = os.OpenFile(filepath.Join(store.dataDirectory, "eventlog.dat"), os.O_APPEND|os.O_WRONLY, 0600)
+	} else {
+		file, err = os.Create(filepath.Join(store.dataDirectory, "eventlog.dat"))
 	}
 
-	// Append the new event to the aggregate instance file:
-	if file == nil {
-		file, err = os.OpenFile(aggregateInstanceFile, os.O_APPEND|os.O_WRONLY, 0600)
-		if err != nil {
-			mutex.Unlock()
-			return err
-		}
-		defer file.Close()
+	if err != nil {
+		mutex.Unlock()
+		return err
 	}
+	defer file.Close()
 	now := time.Now()
-	eventRecord := hist.Event{Timestamp: now, Type: eventType, Data: eventData}
+	eventRecord := hist.Event{Timestamp: now, StreamID: streamID, Type: eventType, Data: eventData}
 	eventRecordJSON, err := json.Marshal(eventRecord)
 	if err != nil {
 		mutex.Unlock()
@@ -75,12 +53,9 @@ func (store fileEventstore) Save(aggregateType string, aggregateID string, event
 	return nil
 }
 
-func checkMandatoryParameters(aggregateType string, aggregateID string, eventType string, eventData []byte) error {
-	if strings.TrimSpace(aggregateType) == "" {
-		return errors.New("aggregateType cannot be blank")
-	}
-	if strings.TrimSpace(aggregateID) == "" {
-		return errors.New("aggregateID cannot be blank")
+func checkMandatoryParameters(streamID string, eventType string, eventData []byte) error {
+	if strings.TrimSpace(streamID) == "" {
+		return errors.New("streamID cannot be blank")
 	}
 	if strings.TrimSpace(eventType) == "" {
 		return errors.New("eventType cannot be blank")

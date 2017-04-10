@@ -30,18 +30,14 @@ func TestCreateMissingDataDirectory(t *testing.T) {
 				dbDirectoryExists := exists(dataStoreDirectory)
 				So(dbDirectoryExists, ShouldBeTrue)
 			})
-			Convey("and the events directory exists.", func() {
-				dbDirectoryExists := exists(dataStoreDirectory + "/events")
-				So(dbDirectoryExists, ShouldBeTrue)
-			})
 		})
 	})
 }
 
 func deleteAllData(dataDirectory string) error {
-	mutex.Lock()
+	// mutex.Lock()
 	err := os.RemoveAll(dataDirectory)
-	mutex.Unlock()
+	// mutex.Unlock()
 	if err != nil {
 		return err
 	}

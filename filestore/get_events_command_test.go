@@ -19,31 +19,12 @@ func TestGettingAggregateWhichDoesntExist(t *testing.T) {
 			panic(err)
 		}
 		Convey("when I get an aggregate which doesn't exist", func() {
-			events, err := store.Get("UnknownAggregate", "12345")
+			events, err := store.Get("UnknownAggregate-12345")
 			if err != nil {
 				panic(err)
 			}
 			Convey("the returned list of events should be empty.", func() {
 				So(events, ShouldBeEmpty)
-			})
-		})
-	})
-}
-
-func TestMissingDataDirectory(t *testing.T) {
-	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-filestore-test-missing-datadirectory"
-		var store hist.Eventstore
-		var err error
-		store, err = FileStore(dataStoreDirectory)
-		if err != nil {
-			panic(err)
-		}
-		deleteAllData(dataStoreDirectory)
-		Convey("when I get an aggregate which doesn't exist", func() {
-			_, err := store.Get("UnknownAggregate", "12345")
-			Convey("an error should occur.", func() {
-				So(err.Error(), ShouldEqual, "Missing data directory")
 			})
 		})
 	})
@@ -65,10 +46,10 @@ func TestGettingOneEvent(t *testing.T) {
 			id, _ := uuid.NewV4()
 			aggregateID := id.String()
 			data := []byte(expectedEventData)
-			eventStore.Save(expectedAggregateType, aggregateID, expectedEventType, data)
+			eventStore.Save(expectedAggregateType+"-"+aggregateID, expectedEventType, data)
 			Convey("when get events is called", func() {
 				Convey("then an aggregate  with the event is returned.", func() {
-					events, err := eventStore.Get(expectedAggregateType, aggregateID)
+					events, err := eventStore.Get(expectedAggregateType + "-" + aggregateID)
 					if err != nil {
 						panic(err)
 					}
@@ -100,17 +81,17 @@ func TestGettingMoreThanOneEvent(t *testing.T) {
 			id, _ := uuid.NewV4()
 			aggregateID := id.String()
 			data := []byte("{\"ShipID\":\"Seagull\",\"Location\":\"At Sea\"}")
-			eventStore.Save(expectedAggregateType, aggregateID, "EventType", data)
+			eventStore.Save(expectedAggregateType+"-"+aggregateID, "EventType", data)
 
 			data = []byte("Second \n event.")
-			eventStore.Save(expectedAggregateType, aggregateID, "EventType", data)
+			eventStore.Save(expectedAggregateType+"-"+aggregateID, "EventType", data)
 
 			data = []byte("Third event.")
-			eventStore.Save(expectedAggregateType, aggregateID, "EventType", data)
+			eventStore.Save(expectedAggregateType+"-"+aggregateID, "EventType", data)
 
 			Convey("when get events is called", func() {
 				Convey("then an aggregate  with three events is returned.", func() {
-					events, err := eventStore.Get(expectedAggregateType, aggregateID)
+					events, err := eventStore.Get(expectedAggregateType + "-" + aggregateID)
 					if err != nil {
 						panic(err)
 					}

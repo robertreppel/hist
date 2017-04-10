@@ -30,6 +30,7 @@ examples/trackmyships/trackmyships.exe
 
 .idea/workspace.xml
 **/.idea/workspace.xml
+**/.idea/dictionaries/*
 
 # LevelDB data
 db/

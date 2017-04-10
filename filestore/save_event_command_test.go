@@ -16,20 +16,14 @@ func TestMandatoryParameters(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	Convey("When saving an event without an aggregate type", t, func() {
-		err = eventStore.Save("", "id", "EventType", []byte("Event data."))
+	Convey("When saving an event without a stream id", t, func() {
+		err = eventStore.Save("", "EventType", []byte("Event data."))
 		Convey("then an error occurs.", func() {
-			So(err.Error(), ShouldEqual, "aggregateType cannot be blank")
-		})
-	})
-	Convey("When saving an event without an aggregate id", t, func() {
-		err = eventStore.Save("SomeAggregate", "", "EventType", []byte("Event data."))
-		Convey("then an error occurs.", func() {
-			So(err.Error(), ShouldEqual, "aggregateID cannot be blank")
+			So(err.Error(), ShouldEqual, "streamID cannot be blank")
 		})
 	})
 	Convey("When saving an event without an event type", t, func() {
-		err = eventStore.Save("SomeAggregate", "1234", "", []byte("Event data."))
+		err = eventStore.Save("SomeAggregate"+"-"+"1234", "", []byte("Event data."))
 		Convey("then an error occurs.", func() {
 			So(err.Error(), ShouldEqual, "eventType cannot be blank")
 		})
@@ -39,7 +33,7 @@ func TestMandatoryParameters(t *testing.T) {
 		id, _ := uuid.NewV4()
 		aggregateID := id.String()
 		var data []byte
-		err = eventStore.Save(aggregateType, aggregateID, "EventType", data)
+		err = eventStore.Save(aggregateType+"-"+aggregateID, "EventType", data)
 		Convey("then an error occurs.", func() {
 			So(err, ShouldNotBeNil)
 		})
@@ -57,9 +51,9 @@ func TestSavingToMissingDataDirectory(t *testing.T) {
 		}
 		deleteAllData(dataStoreDirectory)
 		Convey("saving an event should not succeed", func() {
-			err = eventStore.Save("SomeAggregate", "12356", "EventType", []byte("event data."))
+			err = eventStore.Save("SomeAggregate"+"-"+"12356", "EventType", []byte("event data."))
 			So(err, ShouldNotBeNil)
-			So(err.Error(), ShouldEqual, "No data directory")
+			So(err.Error(), ShouldEqual, "open /tmp/hist-filestore-test-saving-missing-directory/eventlog.dat: no such file or directory")
 		})
 	})
 }
@@ -79,9 +73,9 @@ func TestStoringNewEvent(t *testing.T) {
 			aggregateID := id.String()
 			data := []byte("Here's a test event.")
 			Convey("when save event is called", func() {
-				eventStore.Save(aggregateType, aggregateID, "EventType", data)
+				eventStore.Save(aggregateType+"-"+aggregateID, "EventType", data)
 				Convey("then an aggregate  with the event exists.", func() {
-					events, err := eventStore.Get(aggregateType, aggregateID)
+					events, err := eventStore.Get(aggregateType + "-" + aggregateID)
 					if err != nil {
 						panic(err)
 					}

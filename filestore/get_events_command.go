@@ -6,16 +6,16 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"path/filepath"
 
 	"github.com/robertreppel/hist"
 )
 
 //Get events gets the events for an aggregate
-func (store fileEventstore) Get(aggregateType string, aggregateID string) ([]hist.Event, error) {
-	if exists(store.eventsDirectory) == false {
-		return nil, errors.New("Missing data directory")
-	}
-	path := store.eventsDirectory + "/" + aggregateType + "/" + aggregateID + ".events"
+func (store fileEventstore) Get(streamID string) ([]hist.Event, error) {
+	var events []hist.Event
+	path := filepath.Join(store.dataDirectory, "eventlog.dat")
+
 	mutex.Lock()
 	aggregateExists := exists(path)
 	if !aggregateExists {
@@ -32,7 +32,6 @@ func (store fileEventstore) Get(aggregateType string, aggregateID string) ([]his
 	defer inFile.Close()
 
 	r := bufio.NewReader(inFile)
-	var events []hist.Event
 	encodedMessage, isPrefix, err := r.ReadLine()
 	for err == nil && !isPrefix {
 		messageBytes, err := b64.StdEncoding.DecodeString(string(encodedMessage))
@@ -47,11 +46,13 @@ func (store fileEventstore) Get(aggregateType string, aggregateID string) ([]his
 		}
 		err = json.Unmarshal(messageBytes, &event)
 		if err != nil {
-			errToReturn := errors.New("Failed unmarshalling to event for '" + aggregateType + ":" + aggregateID + "' - " + err.Error())
+			errToReturn := errors.New("Failed unmarshalling to event for '" + streamID + "' - " + err.Error())
 			mutex.Unlock()
 			panic(errToReturn)
 		}
-		events = append(events, event)
+		if event.StreamID == streamID {
+			events = append(events, event)
+		}
 		encodedMessage, isPrefix, err = r.ReadLine()
 	}
 	mutex.Unlock()
