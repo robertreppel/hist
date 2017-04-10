@@ -51,7 +51,7 @@ go build
 
 ## File Storage
 
-Events are stored in an event log on disk. See ```examples/trackmyships```
+Events are stored in an event log on disk. See ```examples/trackmyships```.
 
 ## Tests
 
@@ -63,8 +63,8 @@ Or use http://goconvey.co/. Run it to see BDD-style details about hist's busines
 
 ## Production Use
 
-Hist is considered alpha. Not recommended for production use.
+Hist is considered alpha. Not safe for production use.
 
-## Snapshots
+## TODO: Optimistic Locking
 
-Snapshots are not supported at this time.
+Does not do (yet) support optimistic locking.
