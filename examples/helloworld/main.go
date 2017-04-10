@@ -17,10 +17,10 @@ func main() {
 	aggregateID := "12345"
 	eventType := "CustomerCreated"
 	eventData := []byte("Bill Smith")
-	err = eventStore.Save(aggregateType, aggregateID, eventType, eventData)
+	err = eventStore.Save(aggregateType+"-"+aggregateID, eventType, eventData)
 	failIf(err)
 
-	eventHistory, err := eventStore.Get(aggregateType, aggregateID)
+	eventHistory, err := eventStore.Get(aggregateType + "-" + aggregateID)
 	failIf(err)
 
 	fmt.Printf("Event: '%s' Event data: '%s'\n", eventHistory[0].Type, string(eventHistory[0].Data))

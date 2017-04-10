@@ -27,7 +27,7 @@ func save(planetID string, changes []interface{}) {
 	for _, event := range changes {
 		jsonEvent, err := json.Marshal(event)
 		failIf(err)
-		err = eventStore.Save("world", planetID, reflect.TypeOf(event).String(), []byte(jsonEvent))
+		err = eventStore.Save("world"+"-"+planetID, reflect.TypeOf(event).String(), []byte(jsonEvent))
 		failIf(err)
 	}
 }
@@ -35,7 +35,7 @@ func save(planetID string, changes []interface{}) {
 func load(planetID string) *world {
 	eventStore, err := filestore.FileStore(eventDataDirectory)
 	failIf(err)
-	eventHistory, err := eventStore.Get("world", planetID)
+	eventHistory, err := eventStore.Get("world" + "-" + planetID)
 	failIf(err)
 
 	var events []interface{}

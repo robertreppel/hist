@@ -8,12 +8,9 @@ import (
 	"reflect"
 
 	"github.com/robertreppel/hist"
-	"github.com/robertreppel/hist/dynamostore"
 	"github.com/robertreppel/hist/examples/trackmyships/ship"
 	"github.com/robertreppel/hist/filestore"
 )
-
-const useDynamo = false // false = use local file storage.
 
 func main() {
 	fmt.Println("\nSHIP LOCATION TRACKER")
@@ -90,34 +87,18 @@ const dataStoreDirectory = "/tmp/hist-example-ship"
 const eventstoreTable = "ShipTracker"
 const region = "us-west-2"
 
-// If no endpoint is configured, cloud AWS DynamoDB will be used.
-// const endpoint = ""
-
-// Local DynamoDB; see https://aws.amazon.com/blogs/aws/dynamodb-local-for-desktop-development/
-const endpoint = "http://localhost:8000"
-
 func init() {
-	if useDynamo {
-		fmt.Println("Using Dynamodb.")
-		dynamostore.Create(eventstoreTable, region, endpoint)
-	} else {
-		fmt.Println("Using Filestore.")
-		deleteAllDataFrom(dataStoreDirectory)
-	}
+	fmt.Println("Using Filestore.")
+	deleteAllDataFrom(dataStoreDirectory)
 }
 
 func getPortsOfCallHistory(shipName string) []interface{} {
 	var store hist.Eventstore
 	var err error
-	if useDynamo {
-		store, err = dynamostore.DynamoStore(eventstoreTable, region, endpoint)
-		failIf(err)
-	} else {
-		store, err = filestore.FileStore(dataStoreDirectory)
-		failIf(err)
-	}
+	store, err = filestore.FileStore(dataStoreDirectory)
+	failIf(err)
 
-	eventHistory, err := store.Get(shipAggregateType, shipName)
+	eventHistory, err := store.Get(shipAggregateType + "-" + shipName)
 	failIf(err)
 
 	var events []interface{}
@@ -147,17 +128,12 @@ func getPortsOfCallHistory(shipName string) []interface{} {
 func updatePortsOfCallHistory(shipName string, changes []interface{}) {
 	var store hist.Eventstore
 	var err error
-	if useDynamo {
-		store, err = dynamostore.DynamoStore(eventstoreTable, region, endpoint)
-		failIf(err)
-	} else {
-		store, err = filestore.FileStore(dataStoreDirectory)
-		failIf(err)
-	}
+	store, err = filestore.FileStore(dataStoreDirectory)
+	failIf(err)
 	for _, event := range changes {
 		jsonEvent, err := json.Marshal(event)
 		failIf(err)
-		store.Save("Ship", shipName, reflect.TypeOf(event).String(), []byte(jsonEvent))
+		store.Save("Ship"+"-"+shipName, reflect.TypeOf(event).String(), []byte(jsonEvent))
 	}
 }
 
