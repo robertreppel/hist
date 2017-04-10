@@ -28,3 +28,9 @@ examples/planets/planets.exe
 examples/trackmyships/trackmyships
 examples/trackmyships/trackmyships.exe
 
+.idea/workspace.xml
+**/.idea/workspace.xml
+
+# LevelDB data
+db/
+
