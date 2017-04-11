@@ -28,7 +28,7 @@ func (store levelDbEventstore) Save(streamID string, eventType string, eventData
 	defer db.Close()
 
 	var maxVersionAllKey = []byte("$maxversion-$all")
-	// levelDbMutex.Lock()
+	levelDbMutex.Lock()
 	// Find the new maxVersion:
 	maxVersion, err := db.Get(maxVersionAllKey, nil)
 	if err != nil && strings.Contains(err.Error(), "not found") {
@@ -53,7 +53,7 @@ func (store levelDbEventstore) Save(streamID string, eventType string, eventData
 	err = db.Write(batch, nil)
 	failIf(err)
 
-	// levelDbMutex.Unlock()
+	levelDbMutex.Unlock()
 	return nil
 }
 
