@@ -1,4 +1,4 @@
-package filestore
+package logfile
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ import (
 
 func TestGettingAggregateWhichDoesntExist(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-filestore-test-data"
+		dataStoreDirectory := "/tmp/hist-logfile-test-data"
 		var store hist.Eventstore
 		var err error
 		store, err = FileStore(dataStoreDirectory)
@@ -32,7 +32,7 @@ func TestGettingAggregateWhichDoesntExist(t *testing.T) {
 
 func TestGettingOneEvent(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-test-filestore-data"
+		dataStoreDirectory := "/tmp/hist-test-logfile-data"
 		var eventStore hist.Eventstore
 		var err error
 		eventStore, err = FileStore(dataStoreDirectory)
@@ -69,7 +69,7 @@ func TestGettingOneEvent(t *testing.T) {
 
 func TestGettingMoreThanOneEvent(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-filestore-test-data"
+		dataStoreDirectory := "/tmp/hist-logfile-test-data"
 		var eventStore hist.Eventstore
 		var err error
 		eventStore, err = FileStore(dataStoreDirectory)

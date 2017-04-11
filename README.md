@@ -11,13 +11,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/robertreppel/hist/filestore"
+	"github.com/robertreppel/hist/storage/logfile"
 )
 
 const eventDataDirectory = "/tmp/hist-examples-helloworld"
 
 func main() {
-	eventStore, err := filestore.FileStore(eventDataDirectory)
+	eventStore, err := logfile.FileStore(eventDataDirectory)
 	failIf(err)
 
 	aggregateType := "Customer"
@@ -56,7 +56,7 @@ Events are stored in an event log on disk. See ```examples/trackmyships```.
 
 ## Tests
 
-```go test ./filestore/ . ./examples/trackmyships/ship/```
+```go test ./logfile/ . ./examples/trackmyships/ship/```
 
 Or use http://goconvey.co/. Run it to see BDD-style details about hist's business rules and behaviour:
 

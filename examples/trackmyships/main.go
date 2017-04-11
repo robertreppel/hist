@@ -9,7 +9,7 @@ import (
 
 	"github.com/robertreppel/hist"
 	"github.com/robertreppel/hist/examples/trackmyships/ship"
-	"github.com/robertreppel/hist/filestore"
+	"github.com/robertreppel/hist/storage/logfile"
 )
 
 func main() {
@@ -95,7 +95,7 @@ func init() {
 func getPortsOfCallHistory(shipName string) []interface{} {
 	var store hist.Eventstore
 	var err error
-	store, err = filestore.FileStore(dataStoreDirectory)
+	store, err = logfile.FileStore(dataStoreDirectory)
 	failIf(err)
 
 	eventHistory, err := store.Get(shipAggregateType + "-" + shipName)
@@ -128,7 +128,7 @@ func getPortsOfCallHistory(shipName string) []interface{} {
 func updatePortsOfCallHistory(shipName string, changes []interface{}) {
 	var store hist.Eventstore
 	var err error
-	store, err = filestore.FileStore(dataStoreDirectory)
+	store, err = logfile.FileStore(dataStoreDirectory)
 	failIf(err)
 	for _, event := range changes {
 		jsonEvent, err := json.Marshal(event)

@@ -1,4 +1,4 @@
-package filestore
+package logfile
 
 import (
 	"os"
@@ -18,7 +18,7 @@ func TestMandatoryFilestoreDataDirectory(t *testing.T) {
 }
 
 func TestCreateMissingDataDirectory(t *testing.T) {
-	dataStoreDirectory := "/tmp/hist-test-filestore-create-missing-directory"
+	dataStoreDirectory := "/tmp/hist-test-logfile-create-missing-directory"
 	Convey("Given that no data directory exists", t, func() {
 		deleteAllData(dataStoreDirectory)
 		Convey("when the FileStore is initialized", func() {

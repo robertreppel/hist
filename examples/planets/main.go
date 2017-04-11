@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/robertreppel/hist/filestore"
+	"github.com/robertreppel/hist/storage/logfile"
 )
 
 const eventDataDirectory = "/tmp/hist-examples-planets"
@@ -22,7 +22,7 @@ func main() {
 }
 
 func save(planetID string, changes []interface{}) {
-	eventStore, err := filestore.FileStore(eventDataDirectory)
+	eventStore, err := logfile.FileStore(eventDataDirectory)
 	failIf(err)
 	for _, event := range changes {
 		jsonEvent, err := json.Marshal(event)
@@ -33,7 +33,7 @@ func save(planetID string, changes []interface{}) {
 }
 
 func load(planetID string) *world {
-	eventStore, err := filestore.FileStore(eventDataDirectory)
+	eventStore, err := logfile.FileStore(eventDataDirectory)
 	failIf(err)
 	eventHistory, err := eventStore.Get("world" + "-" + planetID)
 	failIf(err)
