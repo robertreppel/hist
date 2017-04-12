@@ -12,7 +12,7 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
-//Save persists an event for an aggregate.
+//Save persists an event to a stream.
 func (store levelDbEventstore) Save(streamID string, eventType string, eventData []byte) error {
 	err := checkMandatoryParameters(streamID, eventType, eventData)
 	if err != nil {
@@ -41,14 +41,15 @@ func (store levelDbEventstore) Save(streamID string, eventType string, eventData
 	failIf(err)
 	newMaxVersion := fmt.Sprintf("%020d", currentMaxVersion+1)
 
-	keyString := streamID + "-" + newMaxVersion
-	dataKeyString := "$all-" + newMaxVersion
+	streamIDWithMaxVersion := streamID + "-" + newMaxVersion
+	allStreamIDWithMaxVersion := "$all-" + newMaxVersion
 	batch := new(leveldb.Batch)
-	// Store the data to $all:
-	batch.Put([]byte(dataKeyString), []byte(eventRecordJSON))
-	// Store the stream for the aggregate, with the key to look up the actual data from $all:
-	batch.Put([]byte(keyString), []byte(dataKeyString))
-	//Record new maxVersion for $all stream:
+	// Store all events to the $all stream:
+	batch.Put([]byte(allStreamIDWithMaxVersion), []byte(eventRecordJSON))
+	// In addition, store a key to look up the actual data from $all to the stream identified by the streamID:
+	batch.Put([]byte(streamIDWithMaxVersion), []byte(allStreamIDWithMaxVersion))
+	// Record the new maxVersion for the $all stream.
+	// This is needed to support optimistic locking and for event stream subscribers wanting to catch up on events starting with a certain version.
 	batch.Put([]byte(maxVersionAllKey), []byte(newMaxVersion))
 	err = db.Write(batch, nil)
 	failIf(err)

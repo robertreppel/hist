@@ -3,14 +3,14 @@ package hist_test
 import (
 	"fmt"
 
-	"github.com/robertreppel/hist/storage/logfile"
+	"github.com/robertreppel/hist/storage/leveldb"
 )
 
-const eventDataDirectory = "/tmp/hist-logfile-test"
+const eventDataDirectory = "db"
 
 // Storing and retrieving events for an aggregate:
 func Example() {
-	eventStore, err := logfile.FileStore(eventDataDirectory)
+	eventStore, err := leveldb.Store(eventDataDirectory)
 	failIf(err)
 
 	aggregateType := "Customer"

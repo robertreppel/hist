@@ -9,7 +9,7 @@ import (
 
 	"github.com/robertreppel/hist"
 	"github.com/robertreppel/hist/examples/trackmyships/ship"
-	"github.com/robertreppel/hist/storage/logfile"
+	"github.com/robertreppel/hist/storage/leveldb"
 )
 
 func main() {
@@ -83,7 +83,7 @@ func depart(shipName string) string {
 	return result
 }
 
-const dataStoreDirectory = "/tmp/hist-example-ship"
+const dataStoreDirectory = "db"
 const eventstoreTable = "ShipTracker"
 const region = "us-west-2"
 
@@ -95,7 +95,7 @@ func init() {
 func getPortsOfCallHistory(shipName string) []interface{} {
 	var store hist.Eventstore
 	var err error
-	store, err = logfile.FileStore(dataStoreDirectory)
+	store, err = leveldb.Store(dataStoreDirectory)
 	failIf(err)
 
 	eventHistory, err := store.Get(shipAggregateType + "-" + shipName)
@@ -128,7 +128,7 @@ func getPortsOfCallHistory(shipName string) []interface{} {
 func updatePortsOfCallHistory(shipName string, changes []interface{}) {
 	var store hist.Eventstore
 	var err error
-	store, err = logfile.FileStore(dataStoreDirectory)
+	store, err = leveldb.Store(dataStoreDirectory)
 	failIf(err)
 	for _, event := range changes {
 		jsonEvent, err := json.Marshal(event)

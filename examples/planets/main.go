@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/robertreppel/hist/storage/logfile"
+	"github.com/robertreppel/hist/storage/leveldb"
 )
 
-const eventDataDirectory = "/tmp/hist-examples-planets"
+const eventDataDirectory = "db"
 
 func main() {
 	planet, result := createWorld("Earth")
@@ -22,7 +22,7 @@ func main() {
 }
 
 func save(planetID string, changes []interface{}) {
-	eventStore, err := logfile.FileStore(eventDataDirectory)
+	eventStore, err := leveldb.Store(eventDataDirectory)
 	failIf(err)
 	for _, event := range changes {
 		jsonEvent, err := json.Marshal(event)
@@ -33,7 +33,7 @@ func save(planetID string, changes []interface{}) {
 }
 
 func load(planetID string) *world {
-	eventStore, err := logfile.FileStore(eventDataDirectory)
+	eventStore, err := leveldb.Store(eventDataDirectory)
 	failIf(err)
 	eventHistory, err := eventStore.Get("world" + "-" + planetID)
 	failIf(err)

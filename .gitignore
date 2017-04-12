@@ -33,5 +33,7 @@ examples/trackmyships/trackmyships.exe
 **/.idea/dictionaries/*
 
 # LevelDB data
-db/
+**/db
+
+**/debug
 

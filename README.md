@@ -5,26 +5,27 @@ A data store for event sourced applications.
 ## Usage
 
 ```golang
-//Saving and retrieving events for an aggregate.
+//Saving and retrieving events.
 package main
 
 import (
 	"fmt"
 
-	"github.com/robertreppel/hist/storage/logfile"
+	"github.com/robertreppel/hist/storage/leveldb"
 )
 
-const eventDataDirectory = "/tmp/hist-examples-helloworld"
+const eventDataDirectory = "db"
 
 func main() {
-	eventStore, err := logfile.FileStore(eventDataDirectory)
+	eventStore, err := leveldb.Store(eventDataDirectory)
 	failIf(err)
 
 	aggregateType := "Customer"
 	aggregateID := "12345"
+	streamID := aggregateType + "-" + aggregateID
 	eventType := "CustomerCreated"
 	eventData := []byte("Bill Smith")
-	err = eventStore.Save(aggregateType+"-"+aggregateID, eventType, eventData)
+	err = eventStore.Save(streamID, eventType, eventData)
 	failIf(err)
 
 	eventHistory, err := eventStore.Get(aggregateType + "-" + aggregateID)
@@ -50,13 +51,9 @@ go build
 ./planets
 ```
 
-## File Storage
-
-Events are stored in an event log on disk. See ```examples/trackmyships```.
-
 ## Tests
 
-```go test ./logfile/ . ./examples/trackmyships/ship/```
+```go test ./storage/leveldb/ . ./examples/trackmyships/ship/```
 
 Or use http://goconvey.co/. Run it to see BDD-style details about hist's business rules and behaviour:
 

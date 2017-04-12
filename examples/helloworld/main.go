@@ -1,23 +1,24 @@
-//Saving and retrieving events for an aggregate.
+//Saving and retrieving events.
 package main
 
 import (
 	"fmt"
 
-	"github.com/robertreppel/hist/storage/logfile"
+	"github.com/robertreppel/hist/storage/leveldb"
 )
 
-const eventDataDirectory = "/tmp/hist-examples-helloworld"
+const eventDataDirectory = "db"
 
 func main() {
-	eventStore, err := logfile.FileStore(eventDataDirectory)
+	eventStore, err := leveldb.Store(eventDataDirectory)
 	failIf(err)
 
 	aggregateType := "Customer"
 	aggregateID := "12345"
+	streamID := aggregateType + "-" + aggregateID
 	eventType := "CustomerCreated"
 	eventData := []byte("Bill Smith")
-	err = eventStore.Save(aggregateType+"-"+aggregateID, eventType, eventData)
+	err = eventStore.Save(streamID, eventType, eventData)
 	failIf(err)
 
 	eventHistory, err := eventStore.Get(aggregateType + "-" + aggregateID)

@@ -9,7 +9,7 @@ import (
 )
 
 func TestMandatoryParameters(t *testing.T) {
-	dataStoreDirectory := "/tmp/hist-test-leveldb-data"
+	dataStoreDirectory := "db"
 	var eventStore hist.Eventstore
 	var err error
 	eventStore, err = Store(dataStoreDirectory)
@@ -42,7 +42,7 @@ func TestMandatoryParameters(t *testing.T) {
 
 func TestStoringNewEvent(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-leveldb-test-data"
+		dataStoreDirectory := "db"
 		var eventStore hist.Eventstore
 		var err error
 		eventStore, err = Store(dataStoreDirectory)

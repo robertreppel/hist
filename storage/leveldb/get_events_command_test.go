@@ -11,7 +11,7 @@ import (
 
 func TestGettingAggregateWhichDoesntExist(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-leveldb-test-data"
+		dataStoreDirectory := "db"
 		var store hist.Eventstore
 		var err error
 		store, err = Store(dataStoreDirectory)
@@ -32,7 +32,7 @@ func TestGettingAggregateWhichDoesntExist(t *testing.T) {
 
 func TestGettingOneEvent(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-leveldb-test-data"
+		dataStoreDirectory := "db"
 		var eventStore hist.Eventstore
 		var err error
 		eventStore, err = Store(dataStoreDirectory)
@@ -69,7 +69,7 @@ func TestGettingOneEvent(t *testing.T) {
 
 func TestGettingMoreThanOneEvent(t *testing.T) {
 	Convey("Given an event store", t, func() {
-		dataStoreDirectory := "/tmp/hist-leveldb-test-data"
+		dataStoreDirectory := "db"
 		var eventStore hist.Eventstore
 		var err error
 		eventStore, err = Store(dataStoreDirectory)

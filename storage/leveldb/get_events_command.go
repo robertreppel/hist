@@ -8,7 +8,7 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
-//Get events gets the events for an aggregate
+//Get events gets the events for a stream.
 func (store levelDbEventstore) Get(streamID string) ([]hist.Event, error) {
 	db, err := leveldb.OpenFile(store.dataDirectory, nil)
 	failIf(err)
